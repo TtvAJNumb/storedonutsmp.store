@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Donut SMP Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#111;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+
+/* ── PAGE SYSTEM ── */
+.page{display:none}
+.page.active{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── HEADER ── */
+.hdr{display:flex;flex-direction:column;align-items:center;padding:20px 0 14px;background:#111}
+.hdr-logo{width:66px;height:66px;border-radius:50%;overflow:hidden;margin-bottom:8px;cursor:pointer}
+.hdr-logo img{width:100%;height:100%;object-fit:cover}
+.hdr-ip{font-size:11px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;
+  border:1px solid #2a2a2a;border-radius:6px;padding:5px 14px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;background:#161616;transition:background .2s}
+.hdr-ip:hover{background:#1e1e1e}
+.hdr-ip svg{width:12px;height:12px;flex-shrink:0}
+
+/* ── FOOTER ── */
+.ftr{border-top:1px solid #181818;padding:16px;text-align:center;margin-top:auto}
+.ftr-brand{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px}
+.ftr-dot{width:7px;height:7px;background:#2563eb;border-radius:50%}
+.ftr-name{font-size:11px;font-weight:800;letter-spacing:1.5px}
+.ftr-disc{font-size:9px;color:#333;margin-bottom:7px}
+.ftr-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ftr-links a{font-size:8px;color:#444;text-transform:uppercase;letter-spacing:.4px;transition:color .2s}
+.ftr-links a:hover{color:#888}
+
+/* ═══════════════════════════════
+   HOME PAGE
+═══════════════════════════════ */
+.home-body{flex:1;padding:0 12px 20px}
+
+/* Desktop 3-column */
+.home-grid{
+  display:grid;
+  grid-template-columns:1fr 1.6fr 1fr;
+  grid-template-rows:auto auto;
+  gap:8px;
+  max-width:820px;
+  margin:0 auto;
+}
+.hcard-logo   {grid-column:1;grid-row:1}
+.hcard-store  {grid-column:2;grid-row:1/3;position:relative}
+.hcard-discord{grid-column:3;grid-row:1}
+.hcard-stats  {grid-column:1;grid-row:2;position:relative}
+.hcard-join   {grid-column:3;grid-row:2}
+
+/* Card base */
+.hcard{border-radius:12px;overflow:hidden;cursor:pointer;transition:opacity .15s}
+.hcard:hover{opacity:.88}
+
+/* Logo card */
+.hcard-logo{background:#1040a0;display:flex;flex-direction:column}
+.logo-inner{flex:1;display:flex;align-items:center;justify-content:center;padding:18px}
+.logo-inner img{width:82px;height:82px;object-fit:contain}
+.logo-bar{background:#0c0c0c;padding:9px 11px;display:flex;align-items:center;
+  gap:7px;font-size:10px;font-weight:700;letter-spacing:1.5px;color:#bbb}
+.logo-bar svg{width:12px;height:12px;flex-shrink:0;stroke:#666;fill:none;stroke-width:2}
+
+/* Store card */
+.hcard-store img{width:100%;height:100%;object-fit:cover;min-height:280px}
+.card-label{position:absolute;top:12px;left:14px;font-size:18px;font-weight:800;
+  color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.9)}
+
+/* Discord card */
+.hcard-discord{background:#1a1a1a;border:1px solid #222;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:18px 10px;text-align:center;min-height:140px}
+.hcard-discord img{width:44px;height:37px;object-fit:contain;margin-bottom:8px}
+.disc-count{font-size:22px;font-weight:800;line-height:1}
+.disc-sub{font-size:11px;color:#ccc;margin-top:4px}
+.disc-dot{color:#22c55e;margin-right:3px}
+
+/* Stats card */
+.hcard-stats img{width:100%;height:100%;object-fit:cover;min-height:150px;border-radius:12px}
+
+/* Join card */
+.hcard-join{background:#1a1a1a;border:1px solid #222;display:flex;flex-direction:column;overflow:hidden}
+.join-img{width:100%;height:100px;object-fit:cover}
+.join-body{padding:11px 13px;flex:1}
+.join-title{font-size:14px;font-weight:800;margin-bottom:9px}
+.jfl{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.jfv{background:#000;border:1px solid #252525;border-radius:4px;
+  padding:6px 9px;font-size:11px;font-weight:700;color:#fff;margin-bottom:7px}
+
+/* ── MOBILE HOME ── */
+@media(max-width:560px){
+  .home-grid{
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto auto;
+    gap:6px;
+  }
+  .hcard-logo   {grid-column:1;grid-row:1}
+  .hcard-discord{grid-column:2;grid-row:1}
+  .hcard-store  {grid-column:1/3;grid-row:2;position:relative}
+  .hcard-stats  {grid-column:1;grid-row:3;position:relative}
+  .hcard-join   {grid-column:2;grid-row:3}
+
+  .hcard-store img{min-height:180px;max-height:200px}
+  .logo-inner img{width:60px;height:60px}
+  .logo-bar{font-size:9px;padding:7px 8px}
+  .disc-count{font-size:17px}
+  .disc-sub{font-size:10px}
+  .hcard-discord{min-height:110px;padding:12px 8px}
+  .hcard-stats img{min-height:120px}
+  .join-img{height:75px}
+  .join-title{font-size:12px;margin-bottom:6px}
+  .jfv{font-size:10px;padding:5px 7px;margin-bottom:5px}
+  .card-label{font-size:15px}
+}
+
+/* ═══════════════════════════════
+   STORE PAGE
+═══════════════════════════════ */
+.store-body{flex:1;padding:0 14px 30px;max-width:820px;margin:0 auto;width:100%}
+.sec-title{text-align:center;font-size:11px;font-weight:600;letter-spacing:2px;
+  color:#666;text-transform:uppercase;margin:20px 0 11px}
+
+/* Ranks */
+.ranks-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rank-card{background:#161616;border:1px solid #222;border-radius:12px;padding:17px 13px;text-align:center}
+.rank-card.bv{border-color:#2a2a2a}
+.bv-badge{background:#0d260d;color:#4ade80;font-size:8px;font-weight:700;padding:2px 9px;
+  border-radius:20px;display:inline-block;margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
+.rank-name{font-size:17px;font-weight:900;margin-bottom:11px}
+.rank-name sup{color:#3b82f6;font-size:12px;font-weight:700}
+.rank-perks{list-style:none;text-align:left;margin-bottom:13px}
+.rank-perks li{font-size:10px;color:#666;padding:2px 0;display:flex;align-items:center;gap:4px}
+.rank-perks li::before{content:'•';color:#333;font-size:13px}
+.rank-btn{width:100%;padding:9px;border-radius:6px;border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;
+  background:#131f35;color:#3b82f6;transition:background .2s}
+.rank-btn:hover{background:#1a2d4a}
+.rank-btn small{color:#444;font-weight:400;font-size:10px}
+
+@media(max-width:560px){
+  .ranks-row{grid-template-columns:1fr;gap:8px}
+  .rank-card{padding:14px 12px}
+  .rank-name{font-size:16px}
+}
+
+/* Shards */
+.shards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.shard-card{background:#161616;border:1px solid #222;border-radius:12px;
+  padding:11px 9px;text-align:center;position:relative;cursor:pointer;transition:border-color .2s}
+.shard-card:hover{border-color:#333}
+.shard-badge{position:absolute;top:6px;right:6px;font-size:7px;font-weight:800;
+  padding:2px 6px;border-radius:10px;background:#0d260d;color:#4ade80;letter-spacing:.3px;white-space:nowrap}
+.shard-img{width:68px;height:52px;object-fit:contain;margin:0 auto 5px}
+.shard-orig{font-size:9px;color:#3a3a3a;text-decoration:line-through;display:block;margin-bottom:1px}
+.shard-name{font-size:11px;font-weight:700;color:#a855f7;margin-bottom:7px}
+.shard-price{display:inline-block;background:#0e0e0e;border:1px solid #252525;
+  border-radius:4px;padding:3px 11px;font-size:10px;font-weight:600;color:#fff}
+
+@media(max-width:560px){
+  .shards-row{grid-template-columns:repeat(2,1fr);gap:7px}
+  .shard-img{width:58px;height:44px}
+  .shard-name{font-size:10px}
+}
+
+/* ═══════════════════════════════
+   LOGIN PAGE
+═══════════════════════════════ */
+.login-body{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.login-box{background:#191919;border:1px solid #252525;border-radius:14px;
+  padding:28px 22px;width:100%;max-width:370px;text-align:center}
+.login-box h2{font-size:15px;font-weight:700;margin-bottom:20px;line-height:1.4;color:#fff}
+.ptabs{display:flex;gap:8px;justify-content:center;margin-bottom:15px}
+.ptab{display:flex;align-items:center;gap:5px;padding:8px 18px;border-radius:7px;
+  font-size:11px;font-weight:700;border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;letter-spacing:.5px;transition:.2s}
+.ptab.on{background:#2563eb;color:#fff}
+.ptab.off{background:#141414;color:#555;border:1px solid #252525}
+.login-row{display:flex;border:1px solid #2a2a2a;border-radius:7px;overflow:hidden}
+.login-input{flex:1;background:#0a0a0a;border:none;outline:none;
+  padding:11px 13px;color:#fff;font-size:13px;font-family:'Inter',sans-serif}
+.login-input::placeholder{color:#2e2e2e}
+.login-go{background:#2563eb;color:#fff;border:none;padding:11px 15px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;
+  white-space:nowrap;transition:background .2s}
+.login-go:hover{background:#1d4ed8}
+
+/* ═══════════════════════════════
+   BASKET PAGE
+═══════════════════════════════ */
+.basket-body{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:18px 14px}
+.basket-box{background:#191919;border:1px solid #252525;border-radius:14px;width:100%;max-width:480px;overflow:hidden}
+.bhead{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid #1f1f1f}
+.bhead-icon{width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0}
+.bhead-icon img{width:100%;height:100%;object-fit:cover}
+.bhead-info{flex:1}
+.bhead-title{font-size:14px;font-weight:800}
+.bhead-sub{font-size:10px;color:#555}
+.bhead-sub strong{color:#aaa}
+.cur-btn{background:#141414;border:1px solid #252525;color:#888;border-radius:5px;
+  padding:5px 9px;font-size:10px;font-family:'Inter',sans-serif;cursor:pointer}
+.bbody{padding:15px}
+.signed-row{display:flex;align-items:center;gap:9px;margin-bottom:12px;flex-wrap:wrap}
+.mc-av{width:34px;height:34px;border-radius:4px;overflow:hidden;flex-shrink:0}
+.mc-av img{width:100%;height:100%;object-fit:cover}
+.signed-meta p{font-size:9px;color:#555}
+.signed-meta h3{font-size:13px;font-weight:700}
+.wrong{margin-left:auto;text-align:right}
+.wrong span{display:block;font-size:9px;color:#444}
+.wrong a{font-size:11px;color:#2563eb;cursor:pointer}
+.bdiv{border:none;border-top:1px solid #1d1d1d;margin:10px 0}
+.btable{width:100%;font-size:11px;border-collapse:collapse;margin-bottom:12px}
+.btable th{color:#444;font-weight:500;text-align:left;padding:3px 5px;font-size:10px}
+.btable td{padding:8px 5px;border-top:1px solid #181818;color:#ccc}
+.qty-i{background:#0a0a0a;border:1px solid #252525;color:#fff;width:38px;
+  text-align:center;padding:4px;border-radius:4px;font-size:11px}
+.act-btns{display:flex;gap:3px}
+.act-btn{border-radius:4px;width:24px;height:24px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;font-size:11px;border:none}
+.act-default{background:#161616;border:1px solid #252525;color:#777}
+.act-del{background:#270f0f;border:1px solid #3a1515;color:#f87171}
+.act-inf{background:#0d1a2e;border:1px solid #1a3050;color:#60a5fa}
+.proc-btn{width:100%;padding:11px;background:#2563eb;color:#fff;border:none;
+  border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:background .2s}
+.proc-btn:hover{background:#1d4ed8}
+</style>
+</head>
+<body>
+
+<!-- ═══ HOME ═══ -->
+<div id="pg-home" class="page active">
+  <div class="hdr">
+    <div class="hdr-logo"><img src="https://i.imgur.com/xMwT4cQ.png" alt="logo"/></div>
+    <div class="hdr-ip" id="ip-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      DONUTSMP.NET
+    </div>
+  </div>
+
+  <div class="home-body">
+    <div class="home-grid">
+      <!-- Logo -->
+      <div class="hcard hcard-logo">
+        <div class="logo-inner"><img src="https://i.imgur.com/xMwT4cQ.png" alt="donut"/></div>
+        <div class="logo-bar">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          DONUTSMP.NET
+        </div>
+      </div>
+
+      <!-- Store -->
+      <div class="hcard hcard-store" onclick="showPg('store')">
+        <img src="https://i.imgur.com/ZbVq6iK.jpeg" alt="store"/>
+        <div class="card-label">Store</div>
+      </div>
+
+      <!-- Discord -->
+      <a class="hcard hcard-discord" href="https://discord.com/invite/donutsmp" target="_blank">
+        <img src="https://i.imgur.com/pcDYK6f.png" alt="discord"/>
+        <div class="disc-count">800,000+</div>
+        <div class="disc-sub"><span class="disc-dot">●</span>Discord Members</div>
+      </a>
+
+      <!-- Stats -->
+      <div class="hcard hcard-stats">
+        <img src="https://i.imgur.com/vwpeqwH.jpeg" alt="stats"/>
+        <div class="card-label" style="font-size:14px">Stats</div>
+      </div>
+
+      <!-- How To Join -->
+      <div class="hcard hcard-join" onclick="window.open('https://www.youtube.com/watch?v=mPbVIS5wL6A','_blank')">
+        <img class="join-img" src="https://i.imgur.com/CiGvO78.jpeg" alt="join"/>
+        <div class="join-body">
+          <div class="join-title">How To Join</div>
+          <div class="jfl">Server Name</div>
+          <div class="jfv">Donut SMP _</div>
+          <div class="jfl">Server Address</div>
+          <div class="jfv" style="color:#252525">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr">
+    <div class="ftr-brand"><div class="ftr-dot"></div><span class="ftr-name">DONUT SMP</span></div>
+    <div class="ftr-disc">Not associated with Mojang or Microsoft</div>
+    <div class="ftr-links">
+      <a href="#">STORE PRIVACY POLICY</a><a href="#">DONUT PRIVACY POLICY</a>
+      <a href="#">SUPPORT</a><a href="#">TERMS OF SERVICE</a><a href="#">REFUND POLICY</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STORE ═══ -->
+<div id="pg-store" class="page">
+  <div class="hdr">
+    <div class="hdr-logo" onclick="showPg('home')" style="cursor:pointer"><img src="https://i.imgur.com/xMwT4cQ.png" alt="logo"/></div>
+    <div class="hdr-ip">DONUTSMP.NET</div>
+  </div>
+
+  <div class="store-body">
+    <div class="sec-title">Ranks</div>
+    <div class="ranks-row">
+      <div class="rank-card">
+        <div class="rank-name">Donut<sup>+</sup></div>
+        <ul class="rank-perks">
+          <li>9 Homes</li><li>45 Auction Slots</li><li>45 Order Slots</li>
+          <li>32 View Distance</li><li>7 Render Distance</li>
+        </ul>
+        <button class="rank-btn" data-co="donut+">$4.99<small> /month</small></button>
+      </div>
+      <div class="rank-card">
+        <div class="rank-name">Donut<sup>++</sup></div>
+        <ul class="rank-perks">
+          <li>27 Homes</li><li>90 Auction Slots</li><li>90 Order Slots</li>
+          <li>32 View Distance</li><li>7 Render Distance</li>
+        </ul>
+        <button class="rank-btn" data-co="donut++">$14.99<small> /month</small></button>
+      </div>
+      <div class="rank-card bv">
+        <div class="bv-badge">Best Value</div>
+        <div class="rank-name">Donut<sup>+++</sup></div>
+        <ul class="rank-perks">
+          <li>90 Homes</li><li>90 Auction Slots</li><li>90 Order Slots</li>
+          <li>32 View Distance</li><li>7 Render Distance</li><li>Priority Chunk Generation</li>
+        </ul>
+        <button class="rank-btn" data-co="donut+++">$29.99<small> /month</small></button>
+      </div>
+    </div>
+
+    <div class="sec-title">Shards</div>
+    <div class="shards-row">
+      <div class="shard-card" data-co="400shards">
+        <img class="shard-img" src="https://i.imgur.com/yJFKeua.png" alt="400 shards"/>
+        <div class="shard-name">400 Shards</div><div class="shard-price">$0.99</div>
+      </div>
+      <div class="shard-card" data-co="2500shards">
+        <img class="shard-img" src="https://i.imgur.com/cgE03mG.png" alt="2500 shards"/>
+        <div class="shard-name">2,500 Shards</div><div class="shard-price">$4.99</div>
+      </div>
+      <div class="shard-card" data-co="5500shards">
+        <span class="shard-badge">+10%</span>
+        <img class="shard-img" src="https://i.imgur.com/TmPu8UK.png" alt="5500 shards"/>
+        <div class="shard-orig">5,000</div>
+        <div class="shard-name">5,500 Shards</div><div class="shard-price">$9.99</div>
+      </div>
+      <div class="shard-card" data-co="12000shards">
+        <span class="shard-badge">+20%</span>
+        <img class="shard-img" src="https://i.imgur.com/HUTB2iu.png" alt="12000 shards"/>
+        <div class="shard-orig">10,000</div>
+        <div class="shard-name">12,000 Shards</div><div class="shard-price">$19.99</div>
+      </div>
+      <div class="shard-card" data-co="32000shards">
+        <span class="shard-badge">+28%</span>
+        <img class="shard-img" src="https://i.imgur.com/UQOaFHW.png" alt="32000 shards"/>
+        <div class="shard-orig">25,000</div>
+        <div class="shard-name">32,000 Shards</div><div class="shard-price">$49.99</div>
+      </div>
+      <div class="shard-card" data-co="70000shards">
+        <span class="shard-badge" style="font-size:6px">Best Value +40%</span>
+        <img class="shard-img" src="https://i.imgur.com/lOQLUD4.png" alt="70000 shards"/>
+        <div class="shard-orig">50,000</div>
+        <div class="shard-name">70,000 Shards</div><div class="shard-price">$99.99</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr">
+    <div class="ftr-brand"><div class="ftr-dot"></div><span class="ftr-name">DONUT SMP</span></div>
+    <div class="ftr-disc">Not associated with Mojang or Microsoft</div>
+    <div class="ftr-links">
+      <a href="#">STORE PRIVACY POLICY</a><a href="#">DONUT PRIVACY POLICY</a>
+      <a href="#">SUPPORT</a><a href="#">TERMS OF SERVICE</a><a href="#">REFUND POLICY</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="pg-login" class="page">
+  <div class="hdr">
+    <div class="hdr-logo" onclick="showPg('store')" style="cursor:pointer"><img src="https://i.imgur.com/xMwT4cQ.png" alt="logo"/></div>
+    <div class="hdr-ip">DONUTSMP.NET</div>
+  </div>
+
+  <div class="login-body">
+    <div class="login-box">
+      <h2>Enter your Minecraft Username</h2>
+      <div class="ptabs">
+        <button class="ptab on" onclick="setTab(this)">JAVA</button>
+        <button class="ptab off" onclick="setTab(this)">BEDROCK</button>
+      </div>
+      <div class="login-row">
+        <input class="login-input" type="text" placeholder="Enter your username" id="uname"/>
+        <button class="login-go" onclick="doLogin()">Continue ›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr">
+    <div class="ftr-brand"><div class="ftr-dot"></div><span class="ftr-name">DONUT SMP</span></div>
+    <div class="ftr-disc">Not associated with Mojang or Microsoft</div>
+    <div class="ftr-links">
+      <a href="#">STORE PRIVACY POLICY</a><a href="#">DONUT PRIVACY POLICY</a>
+      <a href="#">SUPPORT</a><a href="#">TERMS OF SERVICE</a><a href="#">REFUND POLICY</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BASKET ═══ -->
+<div id="pg-basket" class="page">
+  <div class="hdr">
+    <div class="hdr-logo" onclick="showPg('store')" style="cursor:pointer"><img src="https://i.imgur.com/xMwT4cQ.png" alt="logo"/></div>
+    <div class="hdr-ip">DONUTSMP.NET</div>
+  </div>
+
+  <div class="basket-body">
+    <div class="basket-box">
+      <div class="bhead">
+        <div class="bhead-icon"><img src="https://i.imgur.com/xMwT4cQ.png" alt="icon"/></div>
+        <div class="bhead-info">
+          <div class="bhead-title">Checkout</div>
+          <div class="bhead-sub">Total: <strong id="basket-total">4.99 USD</strong></div>
+        </div>
+        <button class="cur-btn">🌐 USD ▾</button>
+      </div>
+      <div class="bbody">
+        <div class="signed-row">
+          <div class="mc-av"><img id="mc-head" src="https://mc-heads.net/avatar/Steve/48" alt="head"/></div>
+          <div class="signed-meta">
+            <p>You are currently signed in as</p>
+            <h3 id="uname-display">Player</h3>
+          </div>
+          <div class="wrong">
+            <span>Wrong account?</span>
+            <a onclick="showPg('login')">Switch Accounts</a>
+          </div>
+        </div>
+        <hr class="bdiv"/>
+        <table class="btable">
+          <thead><tr><th>Name</th><th>Price</th><th>Qty</th><th></th></tr></thead>
+          <tbody id="basket-items"></tbody>
+        </table>
+        <button class="proc-btn" onclick="doProceed()">Proceed to checkout »</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr">
+    <div class="ftr-brand"><div class="ftr-dot"></div><span class="ftr-name">DONUT SMP</span></div>
+    <div class="ftr-disc">Not associated with Mojang or Microsoft</div>
+    <div class="ftr-links">
+      <a href="#">STORE PRIVACY POLICY</a><a href="#">DONUT PRIVACY POLICY</a>
+      <a href="#">SUPPORT</a><a href="#">TERMS OF SERVICE</a><a href="#">REFUND POLICY</a>
+    </div>
+  </div>
+</div>
+
+<script>
+var pendingCheckout = null;
+var COS = {
+  'donut+':      {url:'https://square.link/u/hzDNWnSP', name:'Donut+ (30 days)',   price:'4.99'},
+  'donut++':     {url:'https://square.link/u/5Q1YzDwU', name:'Donut++ (30 days)',  price:'14.99'},
+  'donut+++':    {url:'https://square.link/u/C3IUJlpK', name:'Donut+++ (30 days)', price:'29.99'},
+  '400shards':   {url:'https://square.link/u/maaKBJoc', name:'400 Shards',         price:'0.99'},
+  '2500shards':  {url:'https://square.link/u/IpEgXiKy', name:'2,500 Shards',       price:'4.99'},
+  '5500shards':  {url:'https://square.link/u/7Wfxvj0u', name:'5,500 Shards',       price:'9.99'},
+  '12000shards': {url:'https://square.link/u/zw8J1QWb', name:'12,000 Shards',      price:'19.99'},
+  '32000shards': {url:'https://square.link/u/Lk8e1COM', name:'32,000 Shards',      price:'49.99'},
+  '70000shards': {url:'https://square.link/u/lwTgw6Wb', name:'70,000 Shards',      price:'99.99'}
+};
+
+function showPg(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function setTab(b) {
+  document.querySelectorAll('.ptab').forEach(t => { t.classList.remove('on'); t.classList.add('off'); });
+  b.classList.remove('off'); b.classList.add('on');
+}
+
+function pickItem(k) { pendingCheckout = k; showPg('login'); }
+
+function doLogin() {
+  var n = document.getElementById('uname').value.trim() || 'Player';
+  document.getElementById('uname-display').textContent = n;
+  document.getElementById('mc-head').src = 'https://mc-heads.net/avatar/' + encodeURIComponent(n) + '/48';
+  if (pendingCheckout) {
+    var it = COS[pendingCheckout];
+    document.getElementById('basket-total').textContent = it.price + ' USD';
+    document.getElementById('basket-items').innerHTML =
+      '<tr>' +
+        '<td>' + it.name + '</td>' +
+        '<td>' + it.price + ' <small style="color:#444">USD</small></td>' +
+        '<td><input class="qty-i" type="text" value="1" disabled/></td>' +
+        '<td><div class="act-btns">' +
+          '<button class="act-btn act-default">↺</button>' +
+          '<button class="act-btn act-inf">ℹ</button>' +
+          '<button class="act-btn act-del" onclick="showPg(\'store\')">✕</button>' +
+        '</div></td>' +
+      '</tr>';
+  }
+  showPg('basket');
+}
+
+function doProceed() {
+  if (pendingCheckout) window.open(COS[pendingCheckout].url, '_blank');
+}
+
+// Wire all buy buttons
+document.querySelectorAll('[data-co]').forEach(el => {
+  el.addEventListener('click', () => pickItem(el.getAttribute('data-co')));
+});
+
+// IP copy
+document.getElementById('ip-btn').addEventListener('click', function() {
+  if (navigator.clipboard) navigator.clipboard.writeText('donutsmp.net');
+  this.textContent = '✓ COPIED!';
+  setTimeout(() => this.innerHTML =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2" width="12" height="12"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> DONUTSMP.NET'
+  , 1500);
+});
+</script>
+</body>
+</html>
